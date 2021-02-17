@@ -1,30 +1,60 @@
-package edu.kpi.ip71.dovhopoliuk.predicate.cycle;
+package edu.kpi.ip71.dovhopoliuk.strategy.violation.finder.cycle;
 
 import edu.kpi.ip71.dovhopoliuk.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.entity.RelationPropertyViolation;
 import edu.kpi.ip71.dovhopoliuk.predicate.reflexivity.AntiReflexivePredicate;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static edu.kpi.ip71.dovhopoliuk.constants.Constants.INTEGER_ZERO;
 
-public class AcyclicPredicate implements Predicate<Relation> {
+public class AcyclicViolationFinder implements BiFunction<Relation, RelationProperty, RelationPropertyViolation> {
 
     private final Predicate<Relation> antiReflexivePredicate = new AntiReflexivePredicate();
 
     @Override
-    public boolean test(final Relation relation) {
+    public RelationPropertyViolation apply(final Relation relation, final RelationProperty property) {
 
-        return antiReflexivePredicate.test(relation) &&
-                IntStream.range(INTEGER_ZERO, relation.getSize())
-                        .noneMatch(index -> doesCycleExistForRoot(relation, index));
+        return RelationPropertyViolation.builder()
+                .property(property)
+                .messages(findViolations(relation))
+                .build();
     }
 
-    private boolean doesCycleExistForRoot(final Relation relation, final int rootIndex) {
+    private List<String> findViolations(final Relation relation) {
+
+        return Stream.concat(findCycleViolations(relation),
+                checkAntiReflexiveViolation(relation).stream())
+                .collect(Collectors.toList());
+    }
+
+    public Stream<String> findCycleViolations(final Relation relation) {
+
+        return IntStream.range(INTEGER_ZERO, relation.getSize())
+                .boxed()
+                .map(index -> getCycleForRoot(relation, index))
+                .filter(Predicate.not(Collection::isEmpty))
+                .map(cycle -> buildCycleViolationMessage(cycle, relation));
+    }
+
+    private Optional<String> checkAntiReflexiveViolation(final Relation relation) {
+
+        return Optional.of(antiReflexivePredicate.test(relation))
+                .filter(Boolean.FALSE::equals)
+                .map(result -> buildPropertyViolationMessage(RelationProperty.ANTIREFLEXIVITY.toString()));
+    }
+
+    private List<Integer> getCycleForRoot(final Relation relation, final int rootIndex) {
 
         Stack<Integer> solutionStack = new Stack<>();
         Stack<Stack<Integer>> variantsStack = new Stack<>();
@@ -39,7 +69,7 @@ public class AcyclicPredicate implements Predicate<Relation> {
 
         }
 
-        return isStackCycled(solutionStack, rootIndex);
+        return new ArrayList<>(solutionStack);
     }
 
     private Optional<Integer> getNextElement(final Stack<Stack<Integer>> variantsStack) {
@@ -75,5 +105,17 @@ public class AcyclicPredicate implements Predicate<Relation> {
         final Stack<Integer> result = new Stack<>();
         stream.forEach(result::push);
         return result;
+    }
+
+    private String buildCycleViolationMessage(final List<Integer> cycle, final Relation relation) {
+
+        return "On relation exists cycle: " + cycle.stream()
+                .map(relation::getElementName)
+                .collect(Collectors.joining("->"));
+    }
+
+    private String buildPropertyViolationMessage(final String propertyName) {
+
+        return "Relation does not have " + propertyName + " property";
     }
 }
