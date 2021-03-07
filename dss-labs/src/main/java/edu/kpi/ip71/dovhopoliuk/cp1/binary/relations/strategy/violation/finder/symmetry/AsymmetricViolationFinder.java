@@ -1,10 +1,10 @@
 package edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.violation.finder.symmetry;
 
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationProperty;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationPropertyViolation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.predicate.reflexivity.AntiReflexivePredicate;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.predicate.symmetry.AntiSymmetricPredicate;
+import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationPropertyViolation;
+import edu.kpi.ip71.dovhopoliuk.common.predicate.reflexivity.AntiReflexivePredicate;
+import edu.kpi.ip71.dovhopoliuk.common.predicate.symmetry.AntiSymmetricPredicate;
 
 import java.util.List;
 import java.util.Optional;

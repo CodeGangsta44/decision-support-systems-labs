@@ -1,16 +1,16 @@
 package edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.violation.finder.symmetry;
 
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationProperty;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationPropertyViolation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationPropertyViolation;
 
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.constants.Constants.INTEGER_ONE;
-import static edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.constants.Constants.INTEGER_ZERO;
+import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ONE;
+import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 
 public class AntiSymmetricViolationFinder implements BiFunction<Relation, RelationProperty,  RelationPropertyViolation> {
 

@@ -1,7 +1,7 @@
 package edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy;
 
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
 
 import java.util.Map;
 import java.util.Set;

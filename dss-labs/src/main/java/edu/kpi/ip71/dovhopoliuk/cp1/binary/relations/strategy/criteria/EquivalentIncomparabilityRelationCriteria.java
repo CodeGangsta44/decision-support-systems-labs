@@ -1,8 +1,8 @@
 package edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.criteria;
 
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationClass;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationClass;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.constants.Constants.INTEGER_ZERO;
+import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 
 public class EquivalentIncomparabilityRelationCriteria implements Function<Relation, RelationClass> {
 
