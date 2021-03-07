@@ -1,9 +1,9 @@
 package edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.violation.finder.transitivity;
 
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationProperty;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.entity.RelationPropertyViolation;
-import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.util.RelationalOperationsUtil;
+import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.common.entity.RelationPropertyViolation;
+import edu.kpi.ip71.dovhopoliuk.common.util.RelationalOperationsUtil;
 
 import java.util.List;
 import java.util.function.BiFunction;
