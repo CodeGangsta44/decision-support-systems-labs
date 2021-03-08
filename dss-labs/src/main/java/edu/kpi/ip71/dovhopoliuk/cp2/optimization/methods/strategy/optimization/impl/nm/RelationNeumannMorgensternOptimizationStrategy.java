@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -30,7 +31,7 @@ public class RelationNeumannMorgensternOptimizationStrategy extends AbstractRela
     @Override
     public String getOptimizedResult(final Relation relation) {
 
-        return "X = {" + getResult(getSCollectionIncrements(getInitialSCollection(relation), relation), relation) + "}";
+        return buildResultString(getResult(getSCollectionIncrements(getInitialSCollection(relation), relation), relation), relation);
     }
 
     private Set<Integer> getInitialSCollection(final Relation relation) {
@@ -80,18 +81,15 @@ public class RelationNeumannMorgensternOptimizationStrategy extends AbstractRela
         return collectionIncrements.get(INTEGER_ZERO);
     }
 
-    private String getResult(final List<Set<Integer>> sCollectionIncrement, final Relation relation) {
+    private Set<Integer> getResult(final List<Set<Integer>> sCollectionIncrement, final Relation relation) {
 
-        final Set<Integer> result = new HashSet<>(getFirstIncrement(sCollectionIncrement));
+        final Set<Integer> result = new LinkedHashSet<>(getFirstIncrement(sCollectionIncrement));
 
         sCollectionIncrement.stream()
                 .skip(INTEGER_ONE)
                 .forEach(increment -> result.addAll(getSuitableElementsFromIncrement(increment, result, relation)));
 
-        return result.stream()
-                .sorted()
-                .map(relation::getElementName)
-                .collect(Collectors.joining(", "));
+        return result;
     }
 
     private Set<Integer> getSuitableElementsFromIncrement(final Set<Integer> increment, final Set<Integer> result, final Relation relation) {
@@ -99,5 +97,37 @@ public class RelationNeumannMorgensternOptimizationStrategy extends AbstractRela
         return increment.stream()
                 .filter(element -> RelationalOperationsUtil.intersectCollections(relation.getUpperSection(element), result).isEmpty())
                 .collect(Collectors.toSet());
+    }
+
+    private boolean performCheckOfResult(final Set<Integer> result, final Relation relation) {
+
+        return checkInternalStabilityOfResult(result, relation) && checkExternalStabilityOfResult(result, relation);
+    }
+
+    private boolean checkInternalStabilityOfResult(final Set<Integer> result, final Relation relation) {
+
+        return result.stream()
+                .allMatch(element -> result.stream()
+                        .filter(innerElement -> !innerElement.equals(element))
+                        .allMatch(innerElement -> checkInternalStabilityCondition(element, innerElement, relation)));
+    }
+
+    private boolean checkInternalStabilityCondition(final int firstElement, final int secondElement, final Relation relation) {
+
+        return !relation.getElement(firstElement, secondElement) && !relation.getElement(secondElement, firstElement);
+    }
+
+    private boolean checkExternalStabilityOfResult(final Set<Integer> result, final Relation relation) {
+
+        return relation.getRelationSet().stream()
+                .filter(Predicate.not(result::contains))
+                .allMatch(element -> result.stream()
+                        .anyMatch(elementFromResult -> relation.getElement(elementFromResult, element)));
+    }
+
+    private String buildResultString(final Set<Integer> result, final Relation relation) {
+
+        return "X = {" + result.stream().map(relation::getElementName).collect(Collectors.joining(", ")) + "}\n"
+                + "Check of internal and external stability passed: " + performCheckOfResult(result, relation);
     }
 }

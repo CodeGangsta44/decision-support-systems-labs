@@ -1,7 +1,10 @@
 package edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.solving.impl;
 
 import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
-import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
+import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.BinaryRelationClassDeterminationStrategy;
+import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.PropertiesDerivationStrategy;
+import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.RelationSimilarClassesChoosingStrategy;
+import edu.kpi.ip71.dovhopoliuk.cp1.binary.relations.strategy.violation.RelationPropertyViolationFindingStrategy;
 import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.optimization.RelationOptimizationStrategy;
 import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.optimization.impl.blocking.AsymmetricRelationBlockingOptimizationStrategy;
 import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.optimization.impl.blocking.RelationBlockingOptimizationStrategy;
@@ -12,7 +15,6 @@ import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.optimization.i
 import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.solving.SolvingStrategy;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DominationAndBlockingSolvingStrategy implements SolvingStrategy {
@@ -27,10 +29,19 @@ public class DominationAndBlockingSolvingStrategy implements SolvingStrategy {
                     Map.entry("X00R", new StrictRelationBlockingOptimizationStrategy())
             );
 
+    final BinaryRelationClassDeterminationStrategy determinationStrategy;
+    final RelationPropertyViolationFindingStrategy relationPropertyViolationFindingStrategy;
+
+    public DominationAndBlockingSolvingStrategy() {
+
+        this.determinationStrategy = new BinaryRelationClassDeterminationStrategy(new PropertiesDerivationStrategy(), new RelationSimilarClassesChoosingStrategy());
+        this.relationPropertyViolationFindingStrategy = new RelationPropertyViolationFindingStrategy();
+    }
+
     @Override
     public String solve(final Relation relation) {
 
-        analyzeAsymmetry(relation);
+        analyzeProperties(relation);
 
         return optimizationStrategies.entrySet().stream()
                 .filter(entry -> entry.getValue().isApplicable(relation))
@@ -38,10 +49,8 @@ public class DominationAndBlockingSolvingStrategy implements SolvingStrategy {
                 .collect(Collectors.joining("\n"));
     }
 
-    private void analyzeAsymmetry(final Relation relation) {
+    private void analyzeProperties(final Relation relation) {
 
-        Optional.of(RelationProperty.ASYMMETRY)
-                .filter(property -> property.test(relation))
-                .ifPresent(property -> relation.getProperties().add(property));
+        determinationStrategy.solve(relation);
     }
 }

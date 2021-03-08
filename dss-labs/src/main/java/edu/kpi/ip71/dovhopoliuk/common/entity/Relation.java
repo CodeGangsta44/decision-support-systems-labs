@@ -20,12 +20,14 @@ import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 @Builder
 public class Relation {
 
+    private String relationName;
     private List<String> elements;
     private List<List<Boolean>> matrix;
     private Set<RelationProperty> properties;
     private List<RelationPropertyViolation> violations;
     private Set<RelationClass> classes;
     private Set<Integer> relationSet;
+    private RelationClass mainClass;
 
     public Boolean getElement(final int rowIndex, final int columnIndex) {
 
@@ -73,6 +75,7 @@ public class Relation {
 
         System.out.println();
         System.out.println();
+        System.out.println("Relation " + relationName);
         System.out.println("Matrix:");
 
         matrix.stream()
@@ -88,6 +91,9 @@ public class Relation {
         Optional.ofNullable(classes)
                 .filter(classes -> !classes.isEmpty())
                 .ifPresent(this::printClasses);
+
+        Optional.ofNullable(mainClass)
+                .ifPresent(mainRelationClass -> System.out.println("Main Relation class: " + mainRelationClass));
     }
 
     private void printViolations(final List<RelationPropertyViolation> violations) {
@@ -104,10 +110,11 @@ public class Relation {
 
     private void printClasses(final Set<RelationClass> classes) {
 
-        System.out.println("\nAll classes: ");
-
-        classes.stream()
+        String classesString = classes.stream()
                 .filter(Predicate.not(RelationClass.UNDEFINED::equals))
-                .forEach(System.out::println);
+                .map(RelationClass::toString)
+                .collect(Collectors.joining(", "));
+
+        System.out.println("\nAll classes: [" + classesString + "]");
     }
 }

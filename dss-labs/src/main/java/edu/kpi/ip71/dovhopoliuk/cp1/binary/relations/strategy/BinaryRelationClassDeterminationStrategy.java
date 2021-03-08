@@ -7,13 +7,13 @@ import edu.kpi.ip71.dovhopoliuk.common.entity.RelationProperty;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class SolvingStrategy {
+public class BinaryRelationClassDeterminationStrategy {
 
     private final PropertiesDerivationStrategy propertiesDerivationStrategy;
     private final RelationSimilarClassesChoosingStrategy relationSimilarClassesChoosingStrategy;
 
-    public SolvingStrategy(final PropertiesDerivationStrategy propertiesDerivationStrategy,
-                           final RelationSimilarClassesChoosingStrategy relationSimilarClassesChoosingStrategy) {
+    public BinaryRelationClassDeterminationStrategy(final PropertiesDerivationStrategy propertiesDerivationStrategy,
+                                                    final RelationSimilarClassesChoosingStrategy relationSimilarClassesChoosingStrategy) {
 
         this.propertiesDerivationStrategy = propertiesDerivationStrategy;
         this.relationSimilarClassesChoosingStrategy = relationSimilarClassesChoosingStrategy;
@@ -27,9 +27,11 @@ public class SolvingStrategy {
 
         foundClasses(relation);
 
-        cleanUpSimilarClasses(relation);
+//        cleanUpSimilarClasses(relation);
 
-        return determineMainClass(relation);
+        determineMainClass(relation);
+
+        return relation.getMainClass();
     }
 
     private void analyzeProperties(final Relation relation) {
@@ -53,13 +55,14 @@ public class SolvingStrategy {
 
     private void cleanUpSimilarClasses(final Relation relation) {
 
-       relationSimilarClassesChoosingStrategy.cleanupSimilarClasses(relation);
+        relationSimilarClassesChoosingStrategy.cleanupSimilarClasses(relation);
     }
 
-    private RelationClass determineMainClass(final Relation relation) {
+    private void determineMainClass(final Relation relation) {
 
-        return relation.getClasses().stream()
+        relation.getClasses().stream()
                 .min(Comparator.comparingInt(Enum::ordinal))
-                .orElse(RelationClass.UNDEFINED);
+                .ifPresentOrElse(relation::setMainClass,
+                        () -> relation.setMainClass(RelationClass.UNDEFINED));
     }
 }
