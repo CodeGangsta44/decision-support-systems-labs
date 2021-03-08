@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.CHAR_ONE;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.EMPTY;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ONE;
+import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.SPACE;
 
 public class ReadInputController {
@@ -55,14 +56,15 @@ public class ReadInputController {
             }
         }
 
-        return relations.stream()
-                .map(this::parseRelation)
+        return IntStream.range(INTEGER_ZERO, relations.size())
+                .mapToObj(index -> parseRelation(relations.get(index), index))
                 .collect(Collectors.toList());
     }
 
-    private Relation parseRelation(final List<String> relation) {
+    private Relation parseRelation(final List<String> relation, final int relationNumber) {
 
         return Relation.builder()
+                .relationName("R" + (relationNumber + INTEGER_ONE))
                 .matrix(parseRelationMatrix(relation))
                 .elements(generateElementNames(relation.size()))
                 .properties(new HashSet<>())

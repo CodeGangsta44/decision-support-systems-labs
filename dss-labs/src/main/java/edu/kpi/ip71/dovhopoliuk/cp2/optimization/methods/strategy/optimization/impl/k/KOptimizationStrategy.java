@@ -74,7 +74,7 @@ public class KOptimizationStrategy extends AbstractRelationOptimizationStrategy 
 
     private String solveForK(final List<List<RelationType>> matrix, final Set<RelationType> usedTypes, final Relation relation, final int k) {
 
-        List<List<Integer>> subsetsByK = matrix.stream()
+        final List<List<Integer>> subsetsByK = matrix.stream()
                 .map(row -> IntStream.range(INTEGER_ZERO, matrix.size())
                         .filter(columnIndex -> usedTypes.contains(row.get(columnIndex)))
                         .boxed()

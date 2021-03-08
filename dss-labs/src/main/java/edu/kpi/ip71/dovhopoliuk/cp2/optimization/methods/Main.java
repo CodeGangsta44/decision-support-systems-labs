@@ -17,6 +17,7 @@ public class Main {
 
             final String result = dominationAndBlockingSolvingStrategy.solve(relation);
             relation.print();
+            System.out.println("\nOptimization:");
             System.out.println(result);
         });
 
