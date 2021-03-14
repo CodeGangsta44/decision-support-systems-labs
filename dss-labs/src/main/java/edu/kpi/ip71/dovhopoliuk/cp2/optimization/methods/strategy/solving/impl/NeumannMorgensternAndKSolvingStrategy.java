@@ -26,7 +26,7 @@ public class NeumannMorgensternAndKSolvingStrategy implements SolvingStrategy {
 
         return optimizationStrategies.entrySet().stream()
                 .filter(entry -> entry.getValue().isApplicable(relation))
-                .map(entry -> "\n" + entry.getKey() + "\n" + entry.getValue().getOptimizedResult(relation))
+                .map(entry -> "\n" + entry.getKey() + ":\n" + entry.getValue().getOptimizedResult(relation))
                 .collect(Collectors.joining("\n"));
     }
 

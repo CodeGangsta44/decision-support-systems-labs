@@ -31,6 +31,11 @@ public class RelationalOperationsUtil {
                 .collect(Collectors.toSet());
     }
 
+    public static int sign(final int value) {
+
+        return Integer.compare(value, 0);
+    }
+
     private static List<List<Boolean>> invertMatrix(final List<List<Boolean>> matrix) {
 
         return matrix.stream()
