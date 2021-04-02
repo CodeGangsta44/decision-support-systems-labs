@@ -54,6 +54,12 @@ public class KOptimizationStrategy extends AbstractRelationOptimizationStrategy 
                 .collect(Collectors.joining("\n\n"));
     }
 
+    @Override
+    public Set<Integer> getOptimizedResultAsSet(final Relation relation) {
+
+        throw new UnsupportedOperationException();
+    }
+
     private List<List<RelationType>> getRelationMatrixWithTypes(final Relation relation) {
 
         return IntStream.range(INTEGER_ZERO, relation.getSize())

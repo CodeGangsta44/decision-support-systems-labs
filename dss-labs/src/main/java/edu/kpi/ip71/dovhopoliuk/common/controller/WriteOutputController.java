@@ -19,6 +19,11 @@ public class WriteOutputController {
         writeToFile(path, createResultString(result));
     }
 
+    public void saveResultString(final String path, final String result) {
+
+        writeToFile(path, result);
+    }
+
     private String createResultString(final List<Relation> relations) {
 
         final StringBuilder stringBuilder = new StringBuilder();

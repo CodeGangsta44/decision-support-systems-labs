@@ -1,6 +1,7 @@
 package edu.kpi.ip71.dovhopoliuk.common.controller;
 
 import edu.kpi.ip71.dovhopoliuk.common.entity.CriteriaInfo;
+import edu.kpi.ip71.dovhopoliuk.common.entity.ElectreInfo;
 import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
 import lombok.SneakyThrows;
 
@@ -43,6 +44,14 @@ public class ReadInputController {
         return Optional.ofNullable(getClass().getClassLoader()
                 .getResource(inputFilePath))
                 .map(this::readCriteriaInputForUrl)
+                .orElse(null);
+    }
+
+    public ElectreInfo readElectreInput(final String inputFilePath) {
+
+        return Optional.ofNullable(getClass().getClassLoader()
+                .getResource(inputFilePath))
+                .map(this::readElectreInputForUrl)
                 .orElse(null);
     }
 
@@ -129,6 +138,26 @@ public class ReadInputController {
                 .build();
     }
 
+    @SneakyThrows
+    private ElectreInfo readElectreInputForUrl(final URL url) {
+
+        final Path path = Paths.get(url.toURI());
+
+        final List<String> lines = Files.readAllLines(path);
+
+        List<List<String>> groups = lines.stream()
+                .reduce(createIdentity(),
+                        this::combineElementForGroupsReduce,
+                        (acc1, acc2) -> acc1);
+
+        return ElectreInfo.builder()
+                .marks(createElectreMarks(groups.get(INTEGER_ZERO)))
+                .weights(createWeights(groups.get(INTEGER_ONE)))
+                .c(createC(groups.get(INTEGER_TWO)))
+                .d(createD(groups.get(INTEGER_TWO)))
+                .build();
+    }
+
     private List<List<String>> combineElementForGroupsReduce(final List<List<String>> accumulator, final String element) {
 
         if (element.isEmpty()) {
@@ -193,5 +222,28 @@ public class ReadInputController {
                 .split(","))
                 .map(element -> Integer.parseInt(element.replace("k", "")) - INTEGER_ONE)
                 .collect(Collectors.toSet());
+    }
+
+    private List<List<Integer>> createElectreMarks(final List<String> marks) {
+
+        return createMarks(marks.subList(INTEGER_ONE, marks.size()));
+    }
+
+    private List<Double> createWeights(final List<String> weights) {
+
+        return Arrays.stream(weights.get(INTEGER_ONE).trim().split(" "))
+                .filter(Predicate.not(String::isEmpty))
+                .map(Double::parseDouble)
+                .collect(Collectors.toList());
+    }
+
+    private double createC(final List<String> lines) {
+
+        return Double.parseDouble(lines.get(INTEGER_ONE).split(" ")[INTEGER_ZERO]);
+    }
+
+    private double createD(final List<String> lines) {
+
+        return Double.parseDouble(lines.get(INTEGER_ONE).split(" ")[INTEGER_ONE]);
     }
 }
