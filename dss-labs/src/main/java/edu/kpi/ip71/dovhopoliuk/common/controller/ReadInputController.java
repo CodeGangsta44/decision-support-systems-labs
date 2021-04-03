@@ -3,6 +3,8 @@ package edu.kpi.ip71.dovhopoliuk.common.controller;
 import edu.kpi.ip71.dovhopoliuk.common.entity.CriteriaInfo;
 import edu.kpi.ip71.dovhopoliuk.common.entity.ElectreInfo;
 import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
+import edu.kpi.ip71.dovhopoliuk.common.entity.TopsisInfo;
+import edu.kpi.ip71.dovhopoliuk.common.entity.VikorInfo;
 import lombok.SneakyThrows;
 
 import java.net.URL;
@@ -23,6 +25,7 @@ import java.util.stream.IntStream;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.CHAR_ONE;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.EMPTY;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ONE;
+import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_THREE;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_TWO;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.SPACE;
@@ -54,6 +57,23 @@ public class ReadInputController {
                 .map(this::readElectreInputForUrl)
                 .orElse(null);
     }
+
+    public TopsisInfo readTopsisInput(final String inputFilePath) {
+
+        return Optional.ofNullable(getClass().getClassLoader()
+                .getResource(inputFilePath))
+                .map(this::readTopsisInputForUrl)
+                .orElse(null);
+    }
+
+    public VikorInfo readVikorInput(final String inputFilePath) {
+
+        return Optional.ofNullable(getClass().getClassLoader()
+                .getResource(inputFilePath))
+                .map(this::readVikorInputForUrl)
+                .orElse(null);
+    }
+
 
     @SneakyThrows
     private List<Relation> readInputForUrl(final URL url) {
@@ -158,6 +178,45 @@ public class ReadInputController {
                 .build();
     }
 
+    @SneakyThrows
+    private TopsisInfo readTopsisInputForUrl(final URL url) {
+
+        final Path path = Paths.get(url.toURI());
+
+        final List<String> lines = Files.readAllLines(path);
+
+        List<List<String>> groups = lines.stream()
+                .reduce(createIdentity(),
+                        this::combineElementForGroupsReduce,
+                        (acc1, acc2) -> acc1);
+
+        return TopsisInfo.builder()
+                .marks(createElectreMarks(groups.get(INTEGER_ZERO)))
+                .weights(createWeights(groups.get(INTEGER_ONE)))
+                .criteriaToMaximize(createCriteria(groups.get(INTEGER_TWO)))
+                .criteriaToMinimize(createCriteria(groups.get(INTEGER_THREE)))
+                .build();
+    }
+
+    @SneakyThrows
+    private VikorInfo readVikorInputForUrl(final URL url) {
+
+        final Path path = Paths.get(url.toURI());
+
+        final List<String> lines = Files.readAllLines(path);
+
+        List<List<String>> groups = lines.stream()
+                .reduce(createIdentity(),
+                        this::combineElementForGroupsReduce,
+                        (acc1, acc2) -> acc1);
+
+        return VikorInfo.builder()
+                .marks(createElectreMarks(groups.get(INTEGER_ZERO)))
+                .weights(createWeights(groups.get(INTEGER_ONE)))
+                .v(createV(groups.get(INTEGER_TWO)))
+                .build();
+    }
+
     private List<List<String>> combineElementForGroupsReduce(final List<List<String>> accumulator, final String element) {
 
         if (element.isEmpty()) {
@@ -245,5 +304,18 @@ public class ReadInputController {
     private double createD(final List<String> lines) {
 
         return Double.parseDouble(lines.get(INTEGER_ONE).split(" ")[INTEGER_ONE]);
+    }
+
+    private List<Integer> createCriteria(final List<String> lines) {
+
+        return Arrays.stream(lines.get(INTEGER_ONE).split(SPACE))
+                .map(Integer::valueOf)
+                .map(value -> value - INTEGER_ONE)
+                .collect(Collectors.toList());
+    }
+
+    private double createV(final List<String> lines) {
+
+        return Double.parseDouble(lines.get(INTEGER_ONE));
     }
 }
