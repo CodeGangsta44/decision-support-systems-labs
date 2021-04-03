@@ -1,6 +1,7 @@
 package edu.kpi.ip71.dovhopoliuk.cp5.topsis.strategy.optimizations.impl;
 
 import edu.kpi.ip71.dovhopoliuk.common.entity.TopsisInfo;
+import edu.kpi.ip71.dovhopoliuk.common.entity.VikorInfo;
 import edu.kpi.ip71.dovhopoliuk.cp5.topsis.strategy.optimizations.OptimizationStrategy;
 import edu.kpi.ip71.dovhopoliuk.cp5.utils.PrintUtils;
 
@@ -32,6 +33,8 @@ public class TopsisOptimizationStrategy implements OptimizationStrategy {
     @Override
     public String optimize(final TopsisInfo topsisInfo) {
 
+        normalizeWeights(topsisInfo);
+
         PrintUtils.printTitleAndIntegerMatrix("Initial marks:", topsisInfo.getMarks());
 
         final List<List<Double>> normalizedMarks = onlyMaximize ? normalizeOnlyForMaximize(topsisInfo) : normalizeMarks(topsisInfo);
@@ -53,13 +56,24 @@ public class TopsisOptimizationStrategy implements OptimizationStrategy {
         PrintUtils.printTitleAndMap("Distances to NIS:", nisDistances);
 
         final Map<Integer, Double> proximityToPis = calculateProximityToPis(pisDistances, nisDistances);
-        PrintUtils.printTitleAndMap("Proximity to PIS:", proximityToPis);
+        PrintUtils.printTitleAndMapWithIndexes("Proximity to PIS:", proximityToPis);
 
         final List<Integer> result = performRanking(proximityToPis);
         PrintUtils.printTitleAndIntegerList("Result ranking:", result.stream().map(value -> value + INTEGER_ONE).collect(Collectors.toList()));
 
 
         return result.toString();
+    }
+
+    private void normalizeWeights(final TopsisInfo topsisInfo) {
+
+        final double sumOfWeight = topsisInfo.getWeights().stream().mapToDouble(value -> value).sum();
+
+        final List<Double> normalizedWeights = IntStream.range(INTEGER_ZERO, topsisInfo.getQuantityOfCriteria())
+                .mapToObj(index -> topsisInfo.getWeights().get(index) / sumOfWeight)
+                .collect(Collectors.toList());
+
+        topsisInfo.setWeights(normalizedWeights);
     }
 
     private List<List<Double>> normalizeOnlyForMaximize(final TopsisInfo topsisInfo) {

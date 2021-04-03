@@ -64,6 +64,13 @@ public class PrintUtils {
                 .collect(Collectors.toList()));
     }
 
+    public static void printTitleAndMapWithIndexes(final String title, final Map<Integer, Double> map) {
+
+        printTitleAndListOfEntries(title, map.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList()));
+    }
+
     public static void printTitleAndListOfEntries(final String title, final List<Map.Entry<Integer, Double>> list) {
 
         final List<String> result = list.stream()

@@ -11,7 +11,10 @@ public class Main {
 
         TopsisInfo topsisInfo = new ReadInputController().readTopsisInput("cp5/topsis/input.txt");
 
+        System.out.println("-=== TOPSIS WITH ONLY MAXIMIZATION ===-");
         new TopsisOptimizationStrategy(Boolean.TRUE).optimize(topsisInfo);
+
+        System.out.println("\n\n-=== TOPSIS WITH MAXIMIZATION AND MINIMIZATION ===-");
         new TopsisOptimizationStrategy(Boolean.FALSE).optimize(topsisInfo);
     }
 }

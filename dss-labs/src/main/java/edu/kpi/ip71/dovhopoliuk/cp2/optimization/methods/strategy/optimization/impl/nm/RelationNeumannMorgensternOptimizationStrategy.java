@@ -37,7 +37,14 @@ public class RelationNeumannMorgensternOptimizationStrategy extends AbstractRela
     @Override
     public Set<Integer> getOptimizedResultAsSet(final Relation relation) {
 
-        return getResult(getSCollectionIncrements(getInitialSCollection(relation), relation), relation);
+        final Set<Integer> result = getResult(getSCollectionIncrements(getInitialSCollection(relation), relation), relation);
+
+        if (!performCheckOfResult(result, relation)) {
+
+            throw new IllegalStateException("The result does not meet the necessary Neumann-Morgenstern conditions!");
+        }
+
+        return result;
     }
 
     private Set<Integer> getInitialSCollection(final Relation relation) {
