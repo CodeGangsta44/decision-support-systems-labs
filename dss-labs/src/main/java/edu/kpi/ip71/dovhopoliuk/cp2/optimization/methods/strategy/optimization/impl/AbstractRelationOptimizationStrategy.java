@@ -7,6 +7,7 @@ import edu.kpi.ip71.dovhopoliuk.cp2.optimization.methods.strategy.optimization.R
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static edu.kpi.ip71.dovhopoliuk.common.constants.Constants.INTEGER_ZERO;
 
@@ -26,7 +27,9 @@ public abstract class AbstractRelationOptimizationStrategy implements RelationOp
     @Override
     public String getOptimizedResult(final Relation relation) {
 
-        return "{" + getResultCollection(relation) + "}";
+        return "{" + getResultStream(relation)
+                .map(relation::getElementName)
+                .collect(Collectors.joining(", ")) + "}";
     }
 
     @Override
@@ -36,17 +39,21 @@ public abstract class AbstractRelationOptimizationStrategy implements RelationOp
                 && relation.getProperties().stream().noneMatch(restrictedProperties::contains);
     }
 
+    @Override
+    public Set<Integer> getOptimizedResultAsSet(final Relation relation) {
+
+        return getResultStream(relation).collect(Collectors.toSet());
+    }
+
     protected boolean checkCondition(final Relation relation, final int element) {
 
         return false;
     }
 
-    private String getResultCollection(final Relation relation) {
+    private Stream<Integer> getResultStream(final Relation relation) {
 
         return IntStream.range(INTEGER_ZERO, relation.getSize())
                 .boxed()
-                .filter(element -> checkCondition(relation, element))
-                .map(relation::getElementName)
-                .collect(Collectors.joining(", "));
+                .filter(element -> checkCondition(relation, element));
     }
 }
