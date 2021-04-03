@@ -2,6 +2,7 @@ package edu.kpi.ip71.dovhopoliuk.common.controller;
 
 import edu.kpi.ip71.dovhopoliuk.common.entity.CriteriaInfo;
 import edu.kpi.ip71.dovhopoliuk.common.entity.ElectreInfo;
+import edu.kpi.ip71.dovhopoliuk.common.entity.FuzzyRelation;
 import edu.kpi.ip71.dovhopoliuk.common.entity.Relation;
 import edu.kpi.ip71.dovhopoliuk.common.entity.TopsisInfo;
 import edu.kpi.ip71.dovhopoliuk.common.entity.VikorInfo;
@@ -38,6 +39,15 @@ public class ReadInputController {
         return Optional.ofNullable(getClass().getClassLoader()
                 .getResource(inputFilePath))
                 .map(this::readInputForUrl)
+                .orElse(Collections.emptyList());
+    }
+
+    @SneakyThrows
+    public List<FuzzyRelation> readFuzzyInput(final String inputFilePath) {
+
+        return Optional.ofNullable(getClass().getClassLoader()
+                .getResource(inputFilePath))
+                .map(this::readFuzzyInputForUrl)
                 .orElse(Collections.emptyList());
     }
 
@@ -115,10 +125,56 @@ public class ReadInputController {
                 .build();
     }
 
+    @SneakyThrows
+    private List<FuzzyRelation> readFuzzyInputForUrl(final URL url) {
+
+        final Path path = Paths.get(url.toURI());
+
+        final List<String> lines = Files.readAllLines(path);
+
+        final List<List<String>> relations = new ArrayList<>();
+
+        List<String> currentRelation = new ArrayList<>();
+
+        for (final String line : lines) {
+
+            if (line.startsWith("№") || line.startsWith("R")) {
+
+                currentRelation = new ArrayList<>();
+                relations.add(currentRelation);
+
+            } else {
+
+                currentRelation.add(line);
+            }
+        }
+
+        return IntStream.range(INTEGER_ZERO, relations.size())
+                .mapToObj(index -> parseFuzzyRelation(relations.get(index), index))
+                .collect(Collectors.toList());
+    }
+
+    private FuzzyRelation parseFuzzyRelation(final List<String> relation, final int relationNumber) {
+
+        return FuzzyRelation.builder()
+                .relationName("R" + (relationNumber + INTEGER_ONE))
+                .matrix(parseFuzzyRelationMatrix(relation))
+                .elements(generateElementNames(relation.size()))
+                .properties(new HashSet<>())
+                .build();
+    }
+
     private List<List<Boolean>> parseRelationMatrix(final List<String> matrix) {
 
         return matrix.stream()
                 .map(this::parseRelationMatrixLine)
+                .collect(Collectors.toList());
+    }
+
+    private List<List<Double>> parseFuzzyRelationMatrix(final List<String> matrix) {
+
+        return matrix.stream()
+                .map(this::parseFuzzyRelationMatrixLine)
                 .collect(Collectors.toList());
     }
 
@@ -128,6 +184,15 @@ public class ReadInputController {
                 .chars()
                 .mapToObj(number -> (char) number)
                 .map(number -> number == CHAR_ONE)
+                .collect(Collectors.toList());
+    }
+
+    private List<Double> parseFuzzyRelationMatrixLine(final String line) {
+
+        return Arrays.stream(line.trim()
+                .split(" "))
+                .filter(str -> !str.equals(""))
+                .map(Double::valueOf)
                 .collect(Collectors.toList());
     }
 
